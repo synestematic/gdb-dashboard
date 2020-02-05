@@ -1887,10 +1887,18 @@ class Registers(Dashboard.Module):
         registers = []
         for name in register_list:
             # Exclude registers with a dot '.' or parse_and_eval() will fail
+            # hidden  registers
             if '.' in name:
                 continue
+            # segment registers
             if len(name) == 2 and name[-1] == 's':
                 continue
+            # number  registers
+            try:
+                int(name[-1])
+                continue
+            except ValueError:
+                pass
             value = gdb.parse_and_eval('${}'.format(name))
             string_value = Registers.format_value(value)
             changed = self.table and (self.table.get(name, '') != string_value)
